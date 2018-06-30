@@ -42,13 +42,19 @@ public func configure(
         databasePort = 5432
     }
     
+    // Vapor Cloud
     let password = Environment.get("DATABASE_PASSWORD") ?? "password"
-    let databaseConfig = PostgreSQLDatabaseConfig(
+    var databaseConfig = PostgreSQLDatabaseConfig(
         hostname: hostname,
         port: databasePort,
         username: username,
         database: databaseName,
         password: password)
+    // Heroku
+    if let url = Environment.get("DATABASE_URL") {
+        databaseConfig = try PostgreSQLDatabaseConfig(url: url)
+    }
+    
     let database = PostgreSQLDatabase(config: databaseConfig)
     databases.add(database: database, as: .psql)
     services.register(databases)

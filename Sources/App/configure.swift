@@ -14,13 +14,10 @@ public func configure(
     try services.register(LeafProvider())
     try services.register(AuthenticationProvider())
     
-    let router = EngineRouter.default()
-    try routes(router)
-    services.register(router, as: Router.self)
-    
     var middlewares = MiddlewareConfig()
     middlewares.use(ErrorMiddleware.self)
     middlewares.use(FileMiddleware.self)
+    middlewares.use(SessionsMiddleware.self)
     services.register(middlewares)
     
     // Configure a database    
@@ -76,4 +73,9 @@ public func configure(
     services.register(commandConfig)
     
     config.prefer(LeafRenderer.self, for: ViewRenderer.self)
+    config.prefer(MemoryKeyedCache.self, for: KeyedCache.self)
+    
+    let router = EngineRouter.default()
+    try routes(router)
+    services.register(router, as: Router.self)
 }

@@ -1,6 +1,7 @@
 import FluentPostgreSQL
 import Vapor
 import Leaf
+import Authentication
 
 
 public func configure(
@@ -11,6 +12,7 @@ public func configure(
 
     try services.register(FluentPostgreSQLProvider())
     try services.register(LeafProvider())
+    try services.register(AuthenticationProvider())
     
     let router = EngineRouter.default()
     try routes(router)
@@ -44,16 +46,16 @@ public func configure(
     
     // Vapor Cloud
     let password = Environment.get("DATABASE_PASSWORD") ?? "password"
-    var databaseConfig = PostgreSQLDatabaseConfig(
+    let databaseConfig = PostgreSQLDatabaseConfig(
         hostname: hostname,
         port: databasePort,
         username: username,
         database: databaseName,
         password: password)
     // Heroku
-    if let url = Environment.get("DATABASE_URL") {
-        databaseConfig = try PostgreSQLDatabaseConfig(url: url)
-    }
+//    if let url = Environment.get("DATABASE_URL") {
+//        databaseConfig = (try PostgreSQLDatabaseConfig(url: url))!
+//    }
     
     let database = PostgreSQLDatabase(config: databaseConfig)
     databases.add(database: database, as: .psql)
@@ -64,6 +66,8 @@ public func configure(
     migrations.add(model: Acronym.self, database: .psql)
     migrations.add(model: Category.self, database: .psql)
     migrations.add(model: AcronymCategoryPivot.self, database: .psql)
+    migrations.add(model: Token.self, database: .psql)
+    migrations.add(migration: AdminUser.self, database: .psql)
     services.register(migrations)
     
     // Add command to reset database (Vapor cloud)

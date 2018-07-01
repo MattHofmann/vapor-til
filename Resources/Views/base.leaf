@@ -45,6 +45,11 @@
                             <input class="nav-link btn btn-link" type="submit" value="Log out">
                         </form>
                     }
+                    #if(!userLoggedIn) {
+                        <li class="nav-item #if(title == "Register"){active}">
+                            <a href="/register" class="nav-link">Register</a>
+                        </li>
+                    }
                 </ul>
             </div>
         </nav>
